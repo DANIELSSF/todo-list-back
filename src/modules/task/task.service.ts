@@ -29,13 +29,8 @@ export class TaskService {
     const newTask = await this.createTask(createTaskDto, user);
     const task = this.taskRepository.create(newTask);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { user: __, ...taskCreationData } = task;
-
     try {
-      await this.taskRepository.save(task);
-
-      return taskCreationData;
+      return await this.taskRepository.save(task);
     } catch (error) {
       this.handleDatabaseError(error);
     }
@@ -53,8 +48,6 @@ export class TaskService {
       .take(limit)
       .getMany();
 
-    //TODO agregar de manera automatica el vencimiento de una tarea
-
     return { userId: user.id, tasks };
   }
 
@@ -69,7 +62,6 @@ export class TaskService {
   }
 
   async updateTask(user: User, taskId: string, updateTaskDto: UpdateTaskDto) {
-    //TODO agregar de manera automatica el vencimiento de una tarea
     const task = await this.findOneTask(user, taskId);
     if (!task.isActive)
       throw new NotFoundException(
@@ -82,8 +74,7 @@ export class TaskService {
     const updateTask = { ...task, ...updateTaskDto };
 
     try {
-      await this.taskRepository.save(updateTask);
-      return task;
+      return await this.taskRepository.save(updateTask);
     } catch (error) {
       this.handleDatabaseError(error);
     }
